@@ -6,4 +6,26 @@
   <packaging>pom</packaging>
   <name>Spring Cloud Project</name>
   <description>exempl</description>
+  
+  <parent>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-parent</artifactId>
+	<version>3.0.0</version>
+	<relativePath/> <!-- lookup parent from repository -->
+  </parent>
+  
+
+	<modules>
+		<module>BookService</module>
+	</modules>
+	
+	 <build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+	
 </project>
