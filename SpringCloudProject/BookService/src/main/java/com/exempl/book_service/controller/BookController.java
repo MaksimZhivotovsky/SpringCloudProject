@@ -30,8 +30,14 @@ public class BookController {
 	private final BookService bookService;
 	
 	@GetMapping
-	public List<Book> getBooks() {
-		return bookService.getBooks();
+	public ResponseEntity<List<Book>> getBooks() {
+		try {
+			List<Book> books = bookService.getBooks();
+			log.info("BookController.getBooks : {}", books);
+			return new ResponseEntity<>(books, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 	
 	@PostMapping

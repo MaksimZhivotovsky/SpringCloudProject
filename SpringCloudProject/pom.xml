@@ -18,6 +18,7 @@
 	<modules>
 		<module>BookService</module>
 		<module>ConfigurationServer</module>
+		<module>EurekaServer</module>
 	</modules>
 	
 </project>
