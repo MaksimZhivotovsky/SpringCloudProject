@@ -1,6 +1,5 @@
 package com.exempl.book_service.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -23,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping(value = "/API/V1/books")
+@RequestMapping(value = "/V1/librarys/{libraryId}/books")
 @RequiredArgsConstructor
 public class BookController {
 
@@ -36,71 +35,70 @@ public class BookController {
 			log.info("BookController.getBooks : {}", books);
 			return new ResponseEntity<>(books, HttpStatus.OK);
 		} catch (Exception e) {
+			log.info("BookController.getBooks: {} ", HttpStatus.NOT_FOUND);
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 	
 	@PostMapping
-	public ResponseEntity<Book> saveBook(@RequestBody Book book) {
+	public ResponseEntity<Book> saveBook(
+			@PathVariable("libraryId") Long libraryId,
+			@RequestBody Book book) {
 		try {
-			bookService.saveBook(book);
+			bookService.saveBook(libraryId, book);
 			log.info("BookController.saveBook : {}", book);
 			return new ResponseEntity<>(book, HttpStatus.CREATED);
 		} catch (Exception e) {
+			log.info("BookController.saveBook: {} ", HttpStatus.NO_CONTENT);
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		}
 	}
+
 	
-	@GetMapping(value = "/title/{title}")
-	public ResponseEntity<List<Book>> findByTitle(@PathVariable("title") String title) {
-		try {
-			List<Book> books = new ArrayList<>();
-			if(title != null) {
-				bookService.findByTitle(title).forEach(books::add);
-			}
-			log.info("BookController.findByTitle : {}", books);
-			return new ResponseEntity<>(books, HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
-	}
-	
-	@PutMapping(value = "/{id}")
-	public ResponseEntity<Book> updateBook(@PathVariable("id") Long id,
+	@PutMapping(value = "/{bookId}")
+	public ResponseEntity<Book> updateBook(
+			@PathVariable("libraryId") Long libraryId,
+			@PathVariable("bookId") Long bookId,
 			@RequestBody Book book) {
-		Book dataBook = bookService.findById(id);
-		if(dataBook != null) {
-			dataBook.setTitle(book.getTitle());
-			dataBook.setAuthor(book.getAuthor());
-			dataBook.setPages(book.getPages());
-			log.info("updateBook : {}" , dataBook);
-			return new ResponseEntity<>(bookService.saveBook(dataBook), HttpStatus.OK);
-		} else {
-			log.info("BookController.updateBook: {} ", HttpStatus.NOT_FOUND);
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
-	}
-	
-	@GetMapping(value = "/{id}")
-	public ResponseEntity<Book> getById(@PathVariable("id") Long id) {
 		try {
-			Book book = bookService.findById(id);
-			log.info("getById : {}", book);
+			bookService.updateBook(libraryId, bookId, book);
+			log.info("BookController.updateBook: {} ", HttpStatus.OK);
 			return new ResponseEntity<>(book, HttpStatus.OK);
 		} catch (Exception e) {
-			log.info("BookController.getById: {} ", HttpStatus.NOT_FOUND);
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			log.info("BookController.updateBook: {} ", HttpStatus.NOT_MODIFIED);
+			return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
 		}
 	}
+	
+//	@GetMapping(value = "/{bookId}")
+//	public ResponseEntity<Book> getById(
+//			@PathVariable("libraryId") Long libraryId,
+//			@PathVariable("bookId") Long bookId) {
+//		try {
+//			Book book = bookService.findById(libraryId, bookId);
+//			log.info("getById : {}", book);
+//			return new ResponseEntity<>(book, HttpStatus.OK);
+//		} catch (Exception e) {
+//			log.info("BookController.getById: {} ", HttpStatus.NOT_FOUND);
+//			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//		}
+//	}
+	
+	@GetMapping(value = "/{bookId}")
+	public Book getById(
+			@PathVariable("libraryId") Long libraryId,
+			@PathVariable("bookId") Long bookId) {
+		return bookService.findById(libraryId, bookId);
+	}
 
-	@DeleteMapping("/{id}")
-	public ResponseEntity<HttpStatus> deleteBook(@PathVariable("id") Long id) {
+	@DeleteMapping("/{bookId}")
+	public ResponseEntity<HttpStatus> deleteBook(@PathVariable("bookId") Long bookId) {
 		try {
-			bookService.deleteBook(id);
-			log.info("BookRestController.saveBook: {} ", HttpStatus.OK);
+			bookService.deleteBook(bookId);
+			log.info("BookController.saveBook: {} ", HttpStatus.OK);
 			return new ResponseEntity<>(HttpStatus.OK);
 		} catch (NoSuchElementException e) {
-			log.info("BookRestController.deleteBook: {} ", HttpStatus.INTERNAL_SERVER_ERROR);
+			log.info("BookController.deleteBook: {} ", HttpStatus.INTERNAL_SERVER_ERROR);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
